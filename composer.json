@@ -1,0 +1,22 @@
+{
+    "name": "mcmaroon/doctrine-orm-convert-mapping",
+    "description": "doctrine-orm-convert-mapping override",
+    "keywords": ["doctrine", "orm", "mapping"],
+    "homepage": "https://github.com/mcmaroon/doctrine-orm-convert-mapping",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "mcmaroon"
+        }
+    ],
+    "require": {
+        "doctrine/orm": "2.5.12",
+        "monolog/monolog": "1.23"
+    },
+    "autoload": {
+        "psr-0": {
+            "": "src/",
+            "DoctrineOrmConvertMapping\\": "src"
+        }
+    }
+}
