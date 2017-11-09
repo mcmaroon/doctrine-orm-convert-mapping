@@ -6,22 +6,17 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Command\Command;
 // ~
-use Doctrine\ORM\Tools\Setup;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\DisconnectedClassMetadataFactory;
 use Doctrine\ORM\Tools\Export\ClassMetadataExporter;
 // ~
 use DoctrineOrmConvertMapping\Doctrine\DBAL\Platforms\MySqlPlatform;
 use DoctrineOrmConvertMapping\Doctrine\DBAL\Schema\MySqlSchemaManager;
 use DoctrineOrmConvertMapping\Doctrine\ORM\Mapping\Driver\DatabaseDriver;
-use DoctrineOrmConvertMapping\Helper\Log;
+use DoctrineOrmConvertMapping\Helper;
 
-class ConvertMappingCommand extends Command {
-
-    const DEFAULT_DEST_PATH = 'mapping';
-
+class ConvertMappingCommand extends Helper\Command {
+    
     protected function configure() {
         $this
                 ->setName('orm:convert-mapping')
@@ -55,7 +50,7 @@ class ConvertMappingCommand extends Command {
             'dest-path' => $input->getOption('dest-path') . DIRECTORY_SEPARATOR . $dbParams['dbname']
         ];
 
-        new Log($this->getName() . ':dbParams', \array_merge($dbParams, $params));
+        new Helper\Log($this->getName() . ':dbParams', \array_merge($dbParams, $params));
 
         // Process destination directory
         if (!is_dir($destPath = $params['dest-path'])) {
@@ -94,11 +89,6 @@ class ConvertMappingCommand extends Command {
         $exporter->setMetadata($metadata);
         $exporter->setOverwriteExistingFiles(true);
         $exporter->export();
-    }
-
-    private function getEntityManager($dbParams) {
-        $config = Setup::createAnnotationMetadataConfiguration(["/src/Entity"], true);
-        return EntityManager::create($dbParams, $config);
     }
 
 }
