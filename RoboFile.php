@@ -24,13 +24,21 @@ class RoboFile extends \Robo\Tasks
     {
         $this->appClearCache();
     }
-
+    
+    /**
+     * orm:convert-mapping
+     */
+    public function appSchema($string)
+    {
+        $this->taskExec('php run.php app:schema ' . $string)->run();
+    }
+    
     /**
      * orm:convert-mapping
      */
     public function appConvertMapping($string)
     {
-        $this->taskExec('php run.php orm:convert-mapping ' . $string)->run();
+        $this->taskExec('php run.php app:convert-mapping ' . $string)->run();
     }
 
     protected function cleanDirectories(array $dirs)
