@@ -14,6 +14,8 @@ use DoctrineOrmConvertMapping\Helper;
 class SchemaCommand extends Helper\Command
 {
 
+    private $destPath;
+
     protected function configure()
     {
         $this
@@ -38,15 +40,15 @@ class SchemaCommand extends Helper\Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $dbParams = $this->getConnectionParams($input);
-        $destPath = $input->getOption('dest-path');
+        $this->destPath = $input->getOption('dest-path');
 
         new Helper\Log($this->getName() . ':dbParams', $dbParams);
 
-        $this->checkDestPath($destPath);
+        $this->checkDestPath($this->destPath);
 
-        $output->writeln("Schema destination directory - " . $destPath);
+        $output->writeln("Schema destination directory - " . $this->destPath);
 
-        $config = $this->getAnnotationMetadataConfiguration($destPath);
+        $config = $this->getAnnotationMetadataConfiguration($this->destPath);
         $em = $this->getEntityManager($dbParams, $config);
         try {
             $em->beginTransaction();
@@ -56,36 +58,61 @@ class SchemaCommand extends Helper\Command
 
         $this->getHelperSet()->set(new EntityManagerHelper($em), 'em');
 
-        $sqlFilePath = $destPath . DIRECTORY_SEPARATOR . self::DEFAULT_SCHEMA_FILE_NAME;
-
         // ~
 
-        $streamHandle = \fopen($sqlFilePath, 'w+');
-        $streamOutput = new StreamOutput($streamHandle);
-        $createCommand = $this->getApplication()->find('orm:schema-tool:create');
-        $createCommandInput = new ArrayInput([
+        $this->executeOrmCommand(self::SCHEMA_TYPE_CREATE, new ArrayInput([
             'command' => 'orm:schema-tool:create',
             '--dump-sql' => true,
-        ]);
-        $createCommand->run($createCommandInput, $streamOutput);
-        \fclose($streamHandle);
+            ]), $output);
 
-        // ~
-
-        $updateCommand = $this->getApplication()->find('orm:schema-tool:update');
-        $updateCommandInput = new ArrayInput([
+        $this->executeOrmCommand(self::SCHEMA_TYPE_UPDATE, new ArrayInput([
             'command' => 'orm:schema-tool:update',
-            '--force' => true,
             '--dump-sql' => true,
-        ]);
-        $updateCommand->run($updateCommandInput, $output);
+            '--force' => true
+            ]), $output);
 
-        // ~
+        $this->executeOrmCommand(self::SCHEMA_TYPE_DROP, new ArrayInput([
+            'command' => 'orm:schema-tool:drop',
+            '--dump-sql' => true
+            ]), $output);
 
         $validateCommand = $this->getApplication()->find('orm:validate-schema');
         $validateCommandInput = new ArrayInput([
             'command' => 'orm:validate-schema',
         ]);
         $validateCommand->run($validateCommandInput, $output);
+    }
+
+    protected function executeOrmCommand($commandType, InputInterface $input, OutputInterface $output)
+    {
+        $revisionCommandTypes = [
+            self::SCHEMA_TYPE_UPDATE
+        ];
+
+        $schemaPath = $this->destPath . self::DEFAULT_SCHEMA_FILE_NAME . '-' . $commandType;
+        $schemaFilePath = $schemaPath . self::DEFAULT_SCHEMA_FILE_EXT;
+        if (\in_array($commandType, $revisionCommandTypes)) {
+            $schemaFilePath = $schemaPath . '-' . date('Y-m-d_H-i-s') . self::DEFAULT_SCHEMA_FILE_EXT;
+        }
+        $streamHandle = \fopen($schemaFilePath, 'w+');
+        $streamOutput = new StreamOutput($streamHandle);
+        $createCommand = $this->getApplication()->find($input->getParameterOption('command'));
+        $createCommand->run($input, $streamOutput);
+        \fclose($streamHandle);
+
+        // ~
+
+        $fileContext = \file_get_contents($schemaFilePath);
+        $noResultsStrings = [
+            'Nothing to update',
+            'No Metadata Classes',
+        ];
+        foreach ($noResultsStrings as $noResultsString) {
+            if (\strpos($fileContext, $noResultsString) !== false) {
+                \unlink($schemaFilePath);
+                $output->writeln("No changes for command: " . $commandType);
+                $output->writeln("Deletes a file: " . $schemaFilePath);
+            }
+        }
     }
 }

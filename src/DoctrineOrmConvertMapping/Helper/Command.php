@@ -12,7 +12,11 @@ abstract class Command extends CommandCore
 {
 
     const DEFAULT_DEST_PATH = 'mapping';
-    const DEFAULT_SCHEMA_FILE_NAME = 'schema.sql';
+    const DEFAULT_SCHEMA_FILE_NAME = 'schema';
+    const DEFAULT_SCHEMA_FILE_EXT = '.sql';
+    const SCHEMA_TYPE_CREATE = 'create';
+    const SCHEMA_TYPE_UPDATE = 'update';
+    const SCHEMA_TYPE_DROP = 'drop';
 
     protected function createDestPath($path)
     {
