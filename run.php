@@ -1,6 +1,8 @@
 <?php
-
-require __DIR__ . '/vendor/autoload.php';
+$autoloadPath = isset($autoloadPath) ? $autoloadPath : __DIR__ . '/vendor/autoload.php';
+if (is_file($autoloadPath)) {
+    require_once $autoloadPath;
+}
 
 use Symfony\Component\Console\Application;
 use DoctrineOrmConvertMapping\Command;
