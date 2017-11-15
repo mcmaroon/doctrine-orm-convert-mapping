@@ -15,6 +15,7 @@ class SchemaCommand extends Helper\Command
 {
 
     private $destPath;
+    private $outPath;
 
     protected function configure()
     {
@@ -32,7 +33,10 @@ class SchemaCommand extends Helper\Command
                     'dbpass', InputArgument::OPTIONAL, '', ''
                 ),
                 new InputOption(
-                    'dest-path', NULL, InputOption::VALUE_OPTIONAL, 'The path to generate your entities classes.', self::DEFAULT_DEST_PATH
+                    'dest-path', NULL, InputOption::VALUE_OPTIONAL, 'The path to your entities classes.', self::DEFAULT_DEST_PATH
+                ),
+                new InputOption(
+                    'out-path', NULL, InputOption::VALUE_OPTIONAL, 'The path to generate your entities schema files.', self::DEFAULT_DEST_PATH
                 ),
         ));
     }
@@ -41,10 +45,12 @@ class SchemaCommand extends Helper\Command
     {
         $dbParams = $this->getConnectionParams($input);
         $this->destPath = $input->getOption('dest-path');
+        $this->outPath = $input->getOption('out-path');
 
         new Helper\Log($this->getName() . ':dbParams', $dbParams);
 
         $this->checkDestPath($this->destPath);
+        $this->createDestPath($this->outPath);
 
         $output->writeln("Schema destination directory - " . $this->destPath);
 
@@ -89,7 +95,7 @@ class SchemaCommand extends Helper\Command
             self::SCHEMA_TYPE_UPDATE
         ];
 
-        $schemaPath = $this->destPath . self::DEFAULT_SCHEMA_FILE_NAME . '-' . $commandType;
+        $schemaPath = $this->outPath . self::DEFAULT_SCHEMA_FILE_NAME . '-' . $commandType;
         $schemaFilePath = $schemaPath . self::DEFAULT_SCHEMA_FILE_EXT;
         if (\in_array($commandType, $revisionCommandTypes)) {
             $schemaFilePath = $schemaPath . '-' . date('Y-m-d_H-i-s') . self::DEFAULT_SCHEMA_FILE_EXT;
