@@ -25,20 +25,14 @@ class RoboFile extends \Robo\Tasks
         $this->appClearCache();
     }
     
-    /**
-     * orm:convert-mapping
-     */
-    public function appSchema($string)
+    public function appSampleSchema()
     {
-        $this->taskExec('php run.php app:schema ' . $string)->run();
+        $this->taskExec('php run.php app:schema doctrine-orm-convert-mapping --dest-path=sample/schema')->run();
     }
     
-    /**
-     * orm:convert-mapping
-     */
-    public function appConvertMapping($string)
+    public function appSampleConvertMapping()
     {
-        $this->taskExec('php run.php app:convert-mapping ' . $string)->run();
+        $this->taskExec('php run.php app:convert-mapping doctrine-orm-convert-mapping --to-type=annotation')->run();
     }
 
     protected function cleanDirectories(array $dirs)

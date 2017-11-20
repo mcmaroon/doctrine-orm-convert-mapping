@@ -53,6 +53,7 @@ class SchemaCommand extends Helper\Command
         $this->createDestPath($this->outPath);
 
         $output->writeln("Schema destination directory - " . $this->destPath);
+        $output->writeln("Schema output directory - " . $this->outPath);
 
         $config = $this->getAnnotationMetadataConfiguration($this->destPath);
         $em = $this->getEntityManager($dbParams, $config);

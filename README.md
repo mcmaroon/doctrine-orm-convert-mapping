@@ -6,4 +6,8 @@ and<br />
 php run.php<br />
 or<br />
 php run.php app:convert-mapping --help<br />
-php run.php app:schema --help
+php run.php app:schema --help<br />
+or<br />
+vendor/bin/robo app:sample-schema
+or<br />
+vendor/bin/robo app:sample-convert-mapping
