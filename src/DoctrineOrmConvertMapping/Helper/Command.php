@@ -5,7 +5,10 @@ use Symfony\Component\Console\Command\Command as CommandCore;
 use Symfony\Component\Console\Input\InputInterface;
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Events;
+use Doctrine\Common\EventManager;
 // ~
+use DoctrineOrmConvertMapping\Helper\DoctrineExtensions\TablePrefix;
 use DoctrineOrmConvertMapping\Doctrine\DBAL\Platforms\MySqlPlatform;
 
 abstract class Command extends CommandCore
@@ -17,6 +20,8 @@ abstract class Command extends CommandCore
     const SCHEMA_TYPE_CREATE = 'create';
     const SCHEMA_TYPE_UPDATE = 'update';
     const SCHEMA_TYPE_DROP = 'drop';
+    
+    protected $tablePrefix = '';
 
     protected function createDestPath($path)
     {
@@ -63,6 +68,9 @@ abstract class Command extends CommandCore
 
     protected function getEntityManager(array $dbParams, \Doctrine\ORM\Configuration $config)
     {
-        return EntityManager::create($dbParams, $config);
+        $evm = new EventManager();
+        $tablePrefix = new TablePrefix($this->tablePrefix);
+        $evm->addEventListener(Events::loadClassMetadata, $tablePrefix);
+        return EntityManager::create($dbParams, $config, $evm);
     }
 }

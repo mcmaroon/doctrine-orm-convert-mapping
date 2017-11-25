@@ -27,7 +27,7 @@ class RoboFile extends \Robo\Tasks
     
     public function appSampleSchema()
     {
-        $this->taskExec('php run.php app:schema doctrine-orm-convert-mapping --dest-path=sample/schema')->run();
+        $this->taskExec('php run.php app:schema doctrine-orm-convert-mapping --dest-path=sample/schema --table-prefix=prefix_')->run();
     }
     
     public function appSampleConvertMapping()

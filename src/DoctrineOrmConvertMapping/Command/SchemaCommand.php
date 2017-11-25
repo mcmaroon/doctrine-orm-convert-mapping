@@ -33,6 +33,9 @@ class SchemaCommand extends Helper\Command
                     'dbpass', InputArgument::OPTIONAL, '', ''
                 ),
                 new InputOption(
+                    'table-prefix', NULL, InputOption::VALUE_OPTIONAL, 'SQL-Table Prefixes', ''
+                ),
+                new InputOption(
                     'dest-path', NULL, InputOption::VALUE_OPTIONAL, 'The path to your entities classes.', self::DEFAULT_DEST_PATH
                 ),
                 new InputOption(
@@ -46,6 +49,7 @@ class SchemaCommand extends Helper\Command
         $dbParams = $this->getConnectionParams($input);
         $this->destPath = $input->getOption('dest-path');
         $this->outPath = $input->getOption('out-path');
+        $this->tablePrefix = $input->getOption('table-prefix');
 
         new Helper\Log($this->getName() . ':dbParams', $dbParams);
 
