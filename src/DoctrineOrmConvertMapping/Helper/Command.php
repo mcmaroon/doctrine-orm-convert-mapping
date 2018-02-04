@@ -6,9 +6,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Events;
+use Doctrine\ORM\Tools\ToolEvents;
 use Doctrine\Common\EventManager;
 // ~
 use DoctrineOrmConvertMapping\Helper\DoctrineExtensions\TablePrefix;
+use DoctrineOrmConvertMapping\Helper\DoctrineExtensions\IgnoreEntityListener;
 use DoctrineOrmConvertMapping\Doctrine\DBAL\Platforms\MySqlPlatform;
 
 abstract class Command extends CommandCore
@@ -71,6 +73,8 @@ abstract class Command extends CommandCore
         $evm = new EventManager();
         $tablePrefix = new TablePrefix($this->tablePrefix);
         $evm->addEventListener(Events::loadClassMetadata, $tablePrefix);
+        $ignoreEntityListener = new IgnoreEntityListener();
+        $evm->addEventListener(ToolEvents::postGenerateSchemaTable, $ignoreEntityListener);
         return EntityManager::create($dbParams, $config, $evm);
     }
 }
