@@ -1,12 +1,13 @@
 {
     "name": "mcmaroon/doctrine-orm-convert-mapping",
-    "description": "doctrine-orm-convert-mapping override",
-    "keywords": ["doctrine", "orm", "mapping"],
+    "description": "Doctrine orm cli reverse engineering wrapper",
+    "keywords": ["doctrine", "orm", "mapping", "helper", "convert", "reverse-engineering"],
     "homepage": "https://github.com/mcmaroon/doctrine-orm-convert-mapping",
     "license": "MIT",
     "authors": [
         {
-            "name": "mcmaroon"
+            "name": "mcmaroon",
+            "email": "mcmaroonmc@gmail.com"
         }
     ],
     "require": {
